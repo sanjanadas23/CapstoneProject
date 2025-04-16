@@ -1,4 +1,4 @@
-package com.aurionpro.lms.dto;
+package com.aurionpro.lending.dto;
 
 import lombok.Data;
 
