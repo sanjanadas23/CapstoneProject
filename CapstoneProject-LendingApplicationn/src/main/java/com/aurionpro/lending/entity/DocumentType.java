@@ -6,23 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
+@Entity
+@Table(name = "document_types")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@Entity
-@Table(name = "roles")
-public class Role {
+public class DocumentType {
 	@Id
 	@Column
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int roleId;
+	private int id;
 
-	@NotBlank(message = "Role name is required")
+	@NotBlank(message = "Type name is required")
 	@Column(unique = true)
-	private String roleName;
-
-	@OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<User> users;
+	private String typeName;
 }

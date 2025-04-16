@@ -1,36 +1,61 @@
 package com.aurionpro.lending.entity;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Entity
+@Table(name = "loan_schemes")
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class LoanScheme {
-	@Column
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long schemaid;
+	@Column
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
 
-    @Column(nullable = false)
-    private String schemeName;
+	@NotBlank(message = "Scheme name is required")
+	@Column(nullable = false)
+	private String schemeName;
 
-    @Column(nullable = false)
-    private Double interestRate;
+	@NotNull(message = "Interest rate is required")
+	@Positive(message = "Interest rate must be positive")
+	@Column(nullable = false)
+	private BigDecimal interestRate;
 
-    @Column(nullable = false)
-    private Integer durationMonths;
+	@NotNull(message = "Tenure in months is required")
+	@Positive(message = "Tenure must be positive")
+	@Column(nullable = false)
+	private Integer tenureMonths;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private SchemaType type;
+	@NotNull(message = "Admin is required")
+	@ManyToOne
+	@JoinColumn(name = "admin_id", nullable = false)
+	private Admin admin;
 
-    @ManyToOne
-    @JoinColumn(name = "admin_id")
-    private Admin admin;
+	@NotEmpty(message = "At least one document type is required")
+	@ManyToMany
+	@JoinTable(name = "loan_scheme_document_types", joinColumns = @JoinColumn(name = "loan_scheme_id"), inverseJoinColumns = @JoinColumn(name = "document_type_id"))
+	private List<DocumentType> requiredDocumentTypes;
 
+	@Column(name = "is_deleted", nullable = false)
+	private boolean isDeleted = false;
 }

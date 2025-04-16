@@ -1,5 +1,7 @@
 package com.aurionpro.lending.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,39 +9,69 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@MappedSuperclass
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
-public abstract class User {
-
-	@Column
+@Table(name = "users")
+public class User {
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Column
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
 
-    @NotBlank(message = "Name is mandatory")
-    @Column(nullable = false, length = 100)
-    private String name;
+	@Email(message = "Invalid email format")
+	@NotBlank(message = "Email is required")
+	@Size(max = 100, message = "Email must not exceed 100 characters")
+	@Column(unique = true)
+	private String email;
 
-    @Email(message = "Invalid email format")
-    @NotBlank(message = "Email is required")
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
+	@NotBlank(message = "Username is required")
+	@Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+	@Column(unique = true)
+	private String username;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
-    @Column(nullable = false)
-    private String password;
+	@NotBlank(message = "Password is required")
+	@Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
+	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$", message = "Password must contain at least one uppercase, one lowercase, one digit, and one special character")
+	private String password; // Stored as BCrypt hash
 
-    @Column(nullable = false)
-    private Boolean isActive = true;
+	@NotNull(message = "Role is required")
+	@ManyToOne
+	@JoinColumn(name = "role_id", nullable = false)
+	private Role role;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "role_id")
-    private Role role;
-	}
+	@Size(max = 50, message = "First name must not exceed 50 characters")
+	@Column(nullable = true)
+	private String firstName;
 
+	@Size(max = 50, message = "Last name must not exceed 50 characters")
+	@Column(nullable = true)
+	private String lastName;
+
+	@Past(message = "Date of birth must be in the past")
+	@Column(nullable = true)
+	private LocalDate dateOfBirth;
+
+	@Pattern(regexp = "^\\d{10}$", message = "Mobile number must be 10 digits")
+	@Column(nullable = true)
+	private String mobileNumber;
+
+	@Pattern(regexp = "^(MALE|FEMALE|OTHER)$", message = "Gender must be MALE, FEMALE, or OTHER")
+	@Column(nullable = true)
+	private String gender;
+
+	@Column(name = "is_deleted", nullable = false)
+	private boolean isDeleted = false;
+}

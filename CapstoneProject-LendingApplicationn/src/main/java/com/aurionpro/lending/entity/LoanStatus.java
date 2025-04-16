@@ -6,23 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
+@Entity
+@Table(name = "loan_statuses")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Entity
-@Table(name = "roles")
-public class Role {
+public class LoanStatus {
 	@Id
 	@Column
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int roleId;
+	private int id;
 
-	@NotBlank(message = "Role name is required")
+	@NotBlank(message = "Status name is required")
 	@Column(unique = true)
-	private String roleName;
-
-	@OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<User> users;
+	private String statusName;
 }
